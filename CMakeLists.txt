@@ -15,7 +15,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMake_CXX_STANDARD 14)
 
 # - Declare the build of mpags-cipher main program
-add_executable(mpags-cipher mpags-cipher.cpp MPAGSCipher/TransformChar.cpp MPAGSCipher/TransformChar.hpp MPAGSCipher/ProcessCommandLine.cpp MPAGSCipher/ProcessCommandLine.hpp)
+add_executable(mpags-cipher mpags-cipher.cpp MPAGSCipher/TransformChar.cpp MPAGSCipher/TransformChar.hpp MPAGSCipher/ProcessCommandLine.cpp MPAGSCipher/ProcessCommandLine.hpp MPAGSCipher/RunCaesarCipher.cpp MPAGSCipher/RunCaesarCipher.hpp)
 
 # - Don't allow C++ Compiler Vendor Extensions
 set(CMAKE_CXX_EXTENSIONS OFF)
