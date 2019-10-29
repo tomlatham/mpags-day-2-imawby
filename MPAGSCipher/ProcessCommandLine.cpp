@@ -4,7 +4,7 @@
 
 #include "ProcessCommandLine.hpp"
 
-bool processCommandLine(const std::vector<std::string>& cmdLineArgs, bool& helpRequested, bool& versionRequested, std::string& inputFileName, std::string& outputFileName){
+bool processCommandLine(const std::vector<std::string>& cmdLineArgs, bool& helpRequested, bool& versionRequested, std::string& inputFileName, std::string& outputFileName, bool& keyGiven, bool& cipherModeGiven, unsigned long& key, bool& isEncryptMode){
 
   // Add a typedef that assigns another name for the given type for clarity
   typedef std::vector<std::string>::size_type size_type;
@@ -19,6 +19,14 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs, bool& helpR
     }
     else if (cmdLineArgs[i] == "--version") {
       versionRequested = true;
+    }
+    else if(cmdLineArgs[i] == "--encrypt"){
+      cipherModeGiven = true;
+      isEncryptMode = true;
+    }
+    else if(cmdLineArgs[i] == "--decrypt"){
+      cipherModeGiven = true;
+      isEncryptMode = false;
     }
     else if (cmdLineArgs[i] == "-i") {
       // Handle input file option
@@ -43,6 +51,20 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs, bool& helpR
       else {
         // Got filename, so assign value and advance past it
         outputFileName = cmdLineArgs[i+1];
+        ++i;
+      }
+    }
+    else if (cmdLineArgs[i] == "-k") {
+      // Handle caesar cipher key option
+      // Next element is key unless -k is the last argument
+      if (i == nCmdLineArgs-1) {
+	std::cerr << "[error] -k requires a key argument" << std::endl;
+        return 1;
+      }
+      else {
+        // Got key, so assign value and advance past it
+	keyGiven = true;
+        key = std::stol(cmdLineArgs[i+1]);
         ++i;
       }
     }

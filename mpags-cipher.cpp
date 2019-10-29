@@ -7,6 +7,7 @@
 // Our project headers
 #include "TransformChar.hpp"
 #include "ProcessCommandLine.hpp"
+#include "RunCaesarCipher.hpp"
 
 // For std::isalpha and std::isupper
 #include <cctype>
@@ -20,10 +21,17 @@ int main(int argc, char* argv[])
   // Options that might be set by the command-line arguments
   bool helpRequested {false};
   bool versionRequested {false};
-  std::string inputFile {""};
-  std::string outputFile {""};
+  bool cipherModeGiven{false};
+  bool keyGiven{false};
+  unsigned long key{0};
+  bool isEncryptMode{false};
 
-  if(processCommandLine(cmdLineArgs, helpRequested, versionRequested, inputFile, outputFile))
+  std::string inputFileName {""};
+  std::string outputFileName {""};
+  std::ifstream inputFile;
+  std::ofstream outputFile;
+
+  if(processCommandLine(cmdLineArgs, helpRequested, versionRequested, inputFileName, outputFileName, keyGiven, cipherModeGiven, key, isEncryptMode))
     return 1;
 
   // Handle help, if requested
@@ -35,6 +43,9 @@ int main(int argc, char* argv[])
       << "Available options:\n\n"
       << "  -h|--help        Print this help message and exit\n\n"
       << "  --version        Print version information\n\n"
+      << "  -k KEY           Key for Caesar cipher"
+      << "  --encrypt        Use Caesar cipher in encrypt mode"
+      << "  --decrypt        Use Caesar cipher in decrypt mode"
       << "  -i FILE          Read text to be processed from FILE\n"
       << "                   Stdin will be used if not supplied\n\n"
       << "  -o FILE          Write processed text to FILE\n"
@@ -52,34 +63,60 @@ int main(int argc, char* argv[])
     return 0;
   }
 
+  if(!cipherModeGiven && !keyGiven){
+    std::cout << "Cipher mode and key have not been given" << std::endl;
+    return 1;
+  }
+
+  if(!cipherModeGiven){
+    std::cout << "Cipher mode has not been given" << std::endl;
+    return 1;
+  }
+
+  if(!keyGiven){
+    std::cout << "Key has not been declared" << std::endl;
+    return 1;
+  }
+
   // Initialise variables for processing input text
   char inputChar {'x'};
-  std::string inputText {""};
+  std::string inputString {""};
 
-  // Read in user input from stdin/file
-  // Warn that input file option not yet implemented
-  if (!inputFile.empty()) {
-    std::cout << "[warning] input from file ('"
-              << inputFile
-              << "') not implemented yet, using stdin\n";
-  }
-
-  // Loop over each character from user input
-  // (until Return then CTRL-D (EOF) pressed)
-  while(std::cin >> inputChar)
-  {
-    inputText += transformChar(inputChar);
+  if (!inputFileName.empty()) {
+    inputFile.open(inputFileName);
+    if(inputFile.good()){   
+      while(inputFile >> inputChar)
+        {
+          inputString += transformChar(inputChar);
+        }
+    } else {
+      return 1;
+    }
+    inputFile.close();
+  } else {
+    while(std::cin >> inputChar)
+      {
+	inputString += transformChar(inputChar);
+      }
   } 
 
+  std::string cipheredString{""};
+
+  cipheredString = runCaesarCipher(inputString, key, isEncryptMode);
+
   // Output the transliterated text
-  // Warn that output file option not yet implemented
-  if (!outputFile.empty()) {
-    std::cout << "[warning] output to file ('"
-              << outputFile
-              << "') not implemented yet, using stdout\n";
+  if (!outputFileName.empty()) {
+    outputFile.open(outputFileName);
+    if(outputFile.good()){ 
+      outputFile << cipheredString;
+    } else {
+      return 1;
+    }
+    outputFile.close();
+  } else {
+    std::cout << cipheredString << std::endl;
   }
 
-  std::cout << inputText << std::endl;
 
   // No requirement to return from main, but we do so for clarity
   // and for consistency with other functions
