@@ -31,8 +31,9 @@ int main(int argc, char* argv[])
   std::ifstream inputFile;
   std::ofstream outputFile;
 
-  if(processCommandLine(cmdLineArgs, helpRequested, versionRequested, inputFileName, outputFileName, keyGiven, cipherModeGiven, key, isEncryptMode))
+  if(processCommandLine(cmdLineArgs, helpRequested, versionRequested, inputFileName, outputFileName, keyGiven, cipherModeGiven, key, isEncryptMode)) {
     return 1;
+  }
 
   // Handle help, if requested
   if (helpRequested) {
@@ -90,19 +91,18 @@ int main(int argc, char* argv[])
           inputString += transformChar(inputChar);
         }
     } else {
+      std::cerr << "[error] could not read from file: " << inputFileName << std::endl;
       return 1;
     }
     inputFile.close();
   } else {
     while(std::cin >> inputChar)
       {
-	inputString += transformChar(inputChar);
+        inputString += transformChar(inputChar);
       }
   } 
 
-  std::string cipheredString{""};
-
-  cipheredString = runCaesarCipher(inputString, key, isEncryptMode);
+  std::string cipheredString { runCaesarCipher(inputString, key, isEncryptMode) };
 
   // Output the transliterated text
   if (!outputFileName.empty()) {
@@ -110,6 +110,7 @@ int main(int argc, char* argv[])
     if(outputFile.good()){ 
       outputFile << cipheredString;
     } else {
+      std::cerr << "[error] could not write to file: " << outputFileName << std::endl;
       return 1;
     }
     outputFile.close();

@@ -64,7 +64,7 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs, bool& helpR
       else {
         // Got key, so assign value and advance past it
 	keyGiven = true;
-        key = std::stol(cmdLineArgs[i+1]);
+        key = std::stoul(cmdLineArgs[i+1]);
         ++i;
       }
     }
